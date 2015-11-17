@@ -18,8 +18,8 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def get_tokens(self, speech):
         """Returns the token list for the specified speech."""
-        return speech['tokenlista']
-    
+        return [token for token in speech['tokenlista'] if token not in STOP_WORDS]
+
     def get_class(self, speech):
         """Returns the class of the specified speech."""
         return "L" if speech['parti'] in ["MP", "S", "V"] else "R"
