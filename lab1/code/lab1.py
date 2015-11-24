@@ -19,7 +19,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
     def get_tokens(self, speech):
         """Returns the token list for the specified speech."""
         return speech['tokenlista']
-    
+
     def get_class(self, speech):
         """Returns the class of the specified speech."""
         return "L" if speech['parti'] in ["MP", "S", "V"] else "R"
@@ -30,19 +30,60 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def precision(self, c, speeches):
         """Computes precision for class `c` on the specified test data."""
-        return super().precision(c, speeches)
+        # Original implementation
+        #return super().precision(c, speeches)
+
+        distribution = self.speech_prediction_distribution(c, speeches)
+
+        true_positives = distribution[0]
+        true_negatives = distribution[1]
+        false_positives = distribution[2]
+        false_negatives = distribution[3]
+
+        return true_positives / (true_positives + false_negatives)
 
     def recall(self, c, speeches):
         """Computes recall for class `c` on the specified test data."""
-        return super().recall(c, speeches)
-    
+        # Original implementaiton
+        # return super().recall(c, speeches)
+
+        distribution = self.speech_prediction_distribution(c, speeches)
+
+        true_positives = distribution[0]
+        true_negatives = distribution[1]
+        false_positives = distribution[2]
+        false_negatives = distribution[3]
+
+        return true_positives / (true_positives + false_positives)
+
     def predict(self, speech):
         """Predicts the class of the specified speech."""
         return super().predict(speech)
-    
+
     def train(self, speeches):
         """Trains using the specified training data."""
         super().train(speeches)
+
+    def speech_prediction_distribution(self, c, speeches):
+        true_positives = 0
+        false_positives = 0
+        true_negatives = 0
+        false_negatives = 0
+
+        for speech in speeches:
+            if c == self.get_class(speech):
+                if self.get_class(speech) == self.predict(speech):
+                    true_positives += 1
+                else:
+                    true_negatives += 1
+            else:
+                if self.get_class(speech) == self.predict(speech):
+                    false_positives += 1
+                else:
+                    false_negatives += 1
+
+        return (true_positives, true_negatives, false_positives, false_negatives)
+
 
 # The following code will be run when you call this script from the
 # command line.
