@@ -4,6 +4,7 @@
 # Marco Kuhlmann <marco.kuhlmann@liu.se>
 
 import nb
+import math
 
 # List of stop words
 
@@ -19,7 +20,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
     def get_tokens(self, speech):
         """Returns the token list for the specified speech."""
         return speech['tokenlista']
-    
+
     def get_class(self, speech):
         """Returns the class of the specified speech."""
         return "L" if speech['parti'] in ["MP", "S", "V"] else "R"
@@ -33,13 +34,23 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         return super().precision(c, speeches)
 
     def recall(self, c, speeches):
-        """Computes recall for class `c` on the specified test data."""
+        """Computes recall for class `c` on the specified test ia."""
         return super().recall(c, speeches)
-    
+
     def predict(self, speech):
         """Predicts the class of the specified speech."""
-        return super().predict(speech)
-    
+        # return super().predict(speech)
+        return 'R' if self.class_probability('R', speech) > self.class_probability('L', speech) else 'L'
+
+    def class_probability(self, c, speech):
+        words = self.get_tokens(speech)
+        probability = self.pc[c]
+
+        for word in words:
+            probability += self.pw[c][word]
+
+        return probability
+
     def train(self, speeches):
         """Trains using the specified training data."""
         super().train(speeches)
