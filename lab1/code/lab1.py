@@ -75,12 +75,12 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
                 if self.get_class(speech) == self.predict(speech):
                     true_positives += 1
                 else:
-                    true_negatives += 1
+                    false_negatives += 1
             else:
                 if self.get_class(speech) == self.predict(speech):
-                    false_positives += 1
+                    true_negatives += 1
                 else:
-                    false_negatives += 1
+                    false_positives += 1
 
         return (true_positives, true_negatives, false_positives, false_negatives)
 
