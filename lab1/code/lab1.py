@@ -26,7 +26,12 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def accuracy(self, speeches):
         """Computes accuracy on the specified test data."""
-        return super().accuracy(speeches)
+        correct = 0
+        for speech in speeches:
+            if self.get_class(speech) == self.predict(speech):
+                correct += 1
+        
+        return correct / len(speeches)
 
     def precision(self, c, speeches):
         """Computes precision for class `c` on the specified test data."""
