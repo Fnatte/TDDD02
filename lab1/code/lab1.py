@@ -40,7 +40,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         false_positives = distribution[2]
         false_negatives = distribution[3]
 
-        return true_positives / (true_positives + false_negatives)
+        return true_positives / (true_positives + false_positives)
 
     def recall(self, c, speeches):
         """Computes recall for class `c` on the specified test data."""
@@ -54,7 +54,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         false_positives = distribution[2]
         false_negatives = distribution[3]
 
-        return true_positives / (true_positives + false_positives)
+        return true_positives / (true_positives + false_negatives)
 
     def predict(self, speech):
         """Predicts the class of the specified speech."""
