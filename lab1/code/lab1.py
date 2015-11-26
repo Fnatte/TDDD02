@@ -64,7 +64,6 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def predict(self, speech):
         """Predicts the class of the specified speech."""
-        # return super().predict(speech)
         return 'R' if self.class_probability('R', speech) > self.class_probability('L', speech) else 'L'
 
     def class_probability(self, c, speech):
@@ -72,7 +71,8 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         probability = self.pc[c]
 
         for word in words:
-            probability += self.pw[c][word]
+            if word in self.pw[c]:
+                probability += self.pw[c][word]
 
         return probability
 
