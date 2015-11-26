@@ -78,7 +78,35 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def train(self, speeches):
         """Trains using the specified training data."""
-        super().train(speeches)
+        class_counts = { 'R': 0, 'L': 0} 
+        for speech in speeches:
+            class_counts[self.get_class(speech)] += 1 
+
+        self.pc = {
+            'R': (float)class_counts['R'] / len(speeches),
+            'L': (float)class_counts['L'] / len(speeches)
+
+        }
+
+
+        word_counts = {
+            'R': {},
+            'L': {}
+        }
+        for speech in speeches:
+            c = self.get_class(speech)
+            words = self.get_tokens(speech)
+            for word in words:
+                if word in word_counts[c].iteritems():
+                    word_counts[c][word] += 1
+                else:
+                    word_counts[c][word] = 1
+
+        self.pw = { 'R': {}, 'L': {} }
+        for c in word_counts:
+            s = sum(word_counts[c])
+            for word in word_counts[c].iteritems():
+                self.pw[c][word] = (float)word_counts[c][word] / s
 
     def speech_prediction_distribution(self, c, speeches):
         true_positives = 0
