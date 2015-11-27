@@ -4,7 +4,6 @@
 # Marco Kuhlmann <marco.kuhlmann@liu.se>
 
 import nb
-import math
 
 # List of stop words
 
@@ -31,7 +30,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         for speech in speeches:
             if self.get_class(speech) == self.predict(speech):
                 correct += 1
-        
+
         return correct / len(speeches)
 
     def precision(self, c, speeches):
@@ -78,35 +77,36 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def train(self, speeches):
         """Trains using the specified training data."""
-        class_counts = { 'R': 0, 'L': 0} 
+        classes = ['R', 'L']
+        class_counts = { 'R': 0, 'L': 0}
+        word_counts = { 'R': {}, 'L': {} }
+
+        # Count the frequency of each class.
         for speech in speeches:
-            class_counts[self.get_class(speech)] += 1 
+            class_counts[self.get_class(speech)] += 1
 
-        self.pc = {
-            'R': (float)class_counts['R'] / len(speeches),
-            'L': (float)class_counts['L'] / len(speeches)
+        # Assign P(c) of each class to self.pc
+        for c in classes:
+            self.pc[c] = class_counts[c] / len(speeches)
 
-        }
-
-
-        word_counts = {
-            'R': {},
-            'L': {}
-        }
+        # Count the frequency of each word in each class.
         for speech in speeches:
             c = self.get_class(speech)
-            words = self.get_tokens(speech)
-            for word in words:
-                if word in word_counts[c].iteritems():
+
+            for word in self.get_tokens(speech):
+                if word in word_counts[c]:
                     word_counts[c][word] += 1
                 else:
                     word_counts[c][word] = 1
 
-        self.pw = { 'R': {}, 'L': {} }
+        # Assign P(w|c) of each word in each class to self.pw
         for c in word_counts:
-            s = sum(word_counts[c])
-            for word in word_counts[c].iteritems():
-                self.pw[c][word] = (float)word_counts[c][word] / s
+            if not c in self.pw:
+                self.pw[c] = {}
+
+            num_tokens = sum(word_counts[c].values())
+            for word in word_counts[c]:
+                self.pw[c][word] = (word_counts[c][word] + 1) / (num_tokens + 1)
 
     def speech_prediction_distribution(self, c, speeches):
         true_positives = 0
