@@ -4,6 +4,10 @@
 # Marco Kuhlmann <marco.kuhlmann@liu.se>
 
 import nb
+import pprint
+from math import log
+
+pp = pprint.PrettyPrinter(indent=4)
 
 # List of stop words
 
@@ -87,7 +91,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
         # Assign P(c) of each class to self.pc
         for c in classes:
-            self.pc[c] = class_counts[c] / len(speeches)
+            self.pc[c] = log(class_counts[c] / len(speeches))
 
         # Count the frequency of each word in each class.
         for speech in speeches:
@@ -100,13 +104,13 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
                     word_counts[c][word] = 1
 
         # Assign P(w|c) of each word in each class to self.pw
-        for c in word_counts:
+        for c in classes:
             if not c in self.pw:
                 self.pw[c] = {}
 
             num_tokens = sum(word_counts[c].values())
             for word in word_counts[c]:
-                self.pw[c][word] = (word_counts[c][word] + 1) / (num_tokens + 1)
+                self.pw[c][word] = log((word_counts[c][word] + 1) / (num_tokens + len(word_counts)))
 
     def speech_prediction_distribution(self, c, speeches):
         true_positives = 0
