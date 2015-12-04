@@ -67,7 +67,8 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
 
     def predict(self, speech):
         """Predicts the class of the specified speech."""
-        return 'R' if self.class_probability('R', speech) > self.class_probability('L', speech) else 'L'
+        c = 'R' if self.class_probability('R', speech) > self.class_probability('L', speech) else 'L'
+        return c
 
     def class_probability(self, c, speech):
         words = self.get_tokens(speech)
@@ -84,6 +85,7 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         classes = ['R', 'L']
         class_counts = { 'R': 0, 'L': 0}
         word_counts = { 'R': {}, 'L': {} }
+        vocabulary = set()
 
         # Count the frequency of each class.
         for speech in speeches:
@@ -93,11 +95,14 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         for c in classes:
             self.pc[c] = log(class_counts[c] / len(speeches))
 
-        # Count the frequency of each word in each class.
+        # Count the frequency of each word in each class. Also add each word to the vocabulary.
         for speech in speeches:
             c = self.get_class(speech)
 
             for word in self.get_tokens(speech):
+
+                vocabulary.add(word)
+
                 if word in word_counts[c]:
                     word_counts[c][word] += 1
                 else:
@@ -107,10 +112,13 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
         for c in classes:
             if not c in self.pw:
                 self.pw[c] = {}
+            
+            #num_tokens = sum(word_counts[c].values())
+            num_tokens = len(word_counts[c])
 
-            num_tokens = sum(word_counts[c].values())
             for word in word_counts[c]:
-                self.pw[c][word] = log((word_counts[c][word] + 1) / (num_tokens + len(word_counts)))
+                probability = log((word_counts[c][word] + 1) / (num_tokens + len(vocabulary)))
+                self.pw[c][word] = probability
 
     def speech_prediction_distribution(self, c, speeches):
         true_positives = 0
