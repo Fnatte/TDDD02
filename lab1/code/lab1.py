@@ -116,8 +116,9 @@ class MyNaiveBayesClassifier(nb.NaiveBayesClassifier):
             #num_tokens = sum(word_counts[c].values())
             num_tokens = len(word_counts[c])
 
-            for word in word_counts[c]:
-                probability = log((word_counts[c][word] + 1) / (num_tokens + len(vocabulary)))
+            for word in vocabulary:
+                word_count = (word_counts[c][word]) if word in word_counts[c] else 0
+                probability = log(word_count + 1 / (num_tokens + len(vocabulary)))
                 self.pw[c][word] = probability
 
     def speech_prediction_distribution(self, c, speeches):
